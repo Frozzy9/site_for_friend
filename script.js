@@ -1,5 +1,5 @@
 /* ============================================================
-   Анна — колорист. Интерактив лендинга.
+   Елена — колорист. Интерактив лендинга.
    ============================================================ */
 
 (function () {
@@ -172,9 +172,36 @@
     });
   }
 
+  /* Страховка: показываем блоки, попавшие в экран, даже если observer не сработал */
+  function revealInView() {
+    var viewportHeight = window.innerHeight;
+
+    revealItems.forEach(function (item) {
+      if (item.classList.contains('is-visible')) {
+        return;
+      }
+
+      var rect = item.getBoundingClientRect();
+      if (rect.top < viewportHeight - 40 && rect.bottom > 0) {
+        item.classList.add('is-visible');
+      }
+    });
+  }
+
+  if (revealItems.length) {
+    window.addEventListener('scroll', revealInView, { passive: true });
+    window.addEventListener('resize', revealInView, { passive: true });
+    revealInView();
+  }
+
   /* Небольшая задержка для карточек галереи */
   Array.prototype.forEach.call(doc.querySelectorAll('.gallery__item'), function (item, index) {
     item.style.setProperty('--reveal-delay', (index % 3) * 70 + 'ms');
+  });
+
+  /* Мягкая лесенка для карточек услуг */
+  Array.prototype.forEach.call(doc.querySelectorAll('.service-card'), function (item, index) {
+    item.style.setProperty('--reveal-delay', (index % 2) * 90 + 'ms');
   });
 
   /* ---------- Лайтбокс для галереи ---------- */
@@ -183,6 +210,9 @@
   var lightboxImg = lightbox ? lightbox.querySelector('.lightbox__img') : null;
   var lightboxClose = lightbox ? lightbox.querySelector('.lightbox__close') : null;
   var lastFocused = null;
+  var lightboxTimer = null;
+  var lightboxClosing = false;
+  var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   function onLightboxKeydown(event) {
     if (event.key === 'Escape') {
@@ -208,30 +238,47 @@
       return;
     }
 
+    if (lightboxTimer) {
+      window.clearTimeout(lightboxTimer);
+      lightboxTimer = null;
+    }
+
+    lightboxClosing = false;
     lastFocused = trigger;
     lightboxImg.src = source;
     lightboxImg.alt = preview ? preview.alt : '';
     lightbox.hidden = false;
+    void lightbox.offsetWidth;
+    lightbox.classList.add('is-open');
     doc.body.classList.add('is-locked');
     doc.addEventListener('keydown', onLightboxKeydown);
     lightboxClose.focus();
   }
 
   function closeLightbox() {
-    if (!lightbox || !lightboxImg || lightbox.hidden) {
+    if (!lightbox || !lightboxImg || lightbox.hidden || lightboxClosing) {
       return;
     }
 
-    lightbox.hidden = true;
-    lightboxImg.removeAttribute('src');
-    lightboxImg.alt = '';
+    lightboxClosing = true;
+    lightbox.classList.remove('is-open');
     doc.body.classList.remove('is-locked');
     doc.removeEventListener('keydown', onLightboxKeydown);
 
-    if (lastFocused) {
-      lastFocused.focus();
-      lastFocused = null;
-    }
+    var finishClose = function () {
+      lightbox.hidden = true;
+      lightboxImg.removeAttribute('src');
+      lightboxImg.alt = '';
+      lightboxClosing = false;
+      lightboxTimer = null;
+
+      if (lastFocused) {
+        lastFocused.focus();
+        lastFocused = null;
+      }
+    };
+
+    lightboxTimer = window.setTimeout(finishClose, reduceMotion ? 0 : 260);
   }
 
   if (lightbox) {

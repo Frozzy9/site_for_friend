@@ -1,5 +1,5 @@
 /* ============================================================
-   Анна — колорист. Светлая минималистичная тема.
+   Елена — колорист. Светлая минималистичная тема.
    ============================================================ */
 
 :root {
@@ -905,6 +905,19 @@ button {
   color: var(--contacts-muted);
 }
 
+.section--contacts .contact__info a {
+  color: var(--contacts-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.section--contacts .contact__info a:hover {
+  color: var(--contacts-accent);
+}
+
 .section--contacts .button {
   background-color: var(--contacts-ink);
   color: var(--contacts-bg);
@@ -978,6 +991,44 @@ button {
   margin: 0;
 }
 
+.footer .footer__disclaimer {
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+}
+
+.footer--dark .footer__disclaimer {
+  color: var(--contacts-muted);
+}
+
+.footer__phone {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+
+.footer__phone a {
+  color: var(--ink-soft);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.footer__phone a:hover {
+  color: var(--accent-dark);
+}
+
+.footer__phone .footer__wa {
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .footer__top {
   color: var(--ink-soft);
   text-decoration: none;
@@ -1005,6 +1056,18 @@ button {
   color: var(--contacts-accent);
 }
 
+.footer--dark .footer__phone a {
+  color: var(--contacts-ink);
+}
+
+.footer--dark .footer__phone .footer__wa {
+  color: var(--contacts-muted);
+}
+
+.footer--dark .footer__phone a:hover {
+  color: var(--contacts-accent);
+}
+
 /* ---------- Лайтбокс ---------- */
 
 .lightbox {
@@ -1017,7 +1080,17 @@ button {
   background-color: rgba(28, 21, 17, 0.84);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  animation: fade-in 0.25s ease both;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.24s ease, visibility 0s linear 0.24s;
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.24s ease, visibility 0s;
 }
 
 .lightbox[hidden] {
@@ -1032,7 +1105,14 @@ button {
   border-radius: var(--radius);
   background-color: var(--surface);
   box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.85);
-  animation: zoom-in 0.3s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  opacity: 0;
+  transform: scale(0.975);
+  transition: opacity 0.24s ease, transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.lightbox.is-open .lightbox__img {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .lightbox__close {
@@ -1063,33 +1143,13 @@ button {
   outline-color: #fff;
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes zoom-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 /* ---------- Появление при скролле ---------- */
 
 .js .reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.75s ease var(--reveal-delay, 0ms),
-    transform 0.75s cubic-bezier(0.2, 0.7, 0.3, 1) var(--reveal-delay, 0ms);
+  transform: translateY(16px);
+  transition: opacity 0.7s ease var(--reveal-delay, 0ms),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
 }
 
 .js .reveal.is-visible {
@@ -1424,8 +1484,9 @@ button {
   transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
-.service-card:hover .service-card__media img {
-  transform: scale(1.05);
+.service-card:hover .service-card__media img,
+.service-card:focus-visible .service-card__media img {
+  transform: scale(1.035);
 }
 
 .service-card__body {
